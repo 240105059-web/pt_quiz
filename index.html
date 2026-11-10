@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pythagorean Theorem Quiz</title>
+<style>
+:root{
+  --bg:#eef3fa; --card:#ffffff; --ink:#14284b; --muted:#5b6b86; --line:#d5deec;
+  --brand:#1d4ed8; --brand-ink:#ffffff; --sel:#e6eeff;
+  --easy:#0f8a5f; --easy-bg:#e0f5ec; --med:#b45309; --med-bg:#fdf0d9; --hard:#a21caf; --hard-bg:#f8e6fb;
+  --hint-bg:#fff8e1; --hint-line:#f0d27a; --sol-bg:#eaf6f1; --sol-line:#9ad3bb;
+  --ok:#0f8a5f; --bad:#c2301f;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0e1626; --card:#16213a; --ink:#e8eefb; --muted:#9db0cf; --line:#2c3b5c;
+    --brand:#6c9bff; --brand-ink:#0e1626; --sel:#1f3158;
+    --easy:#4cd3a0; --easy-bg:#12372c; --med:#f5b455; --med-bg:#3b2a10; --hard:#e08cf0; --hard-bg:#38153f;
+    --hint-bg:#352d12; --hint-line:#7a6624; --sol-bg:#12332a; --sol-line:#2f7a62;
+    --ok:#4cd3a0; --bad:#ff8b7a;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.5;min-height:100vh}
+.wrap{max-width:660px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+header svg{flex:none;width:44px;height:44px}
+header h1{font-size:1.25rem;line-height:1.2;margin:0}
+header p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 18px}
+.progress-row{display:flex;justify-content:space-between;align-items:center;font-size:.9rem;color:var(--muted);margin-bottom:8px}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;width:0;background:var(--brand);border-radius:99px;transition:width .3s ease}
+.badge{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:99px}
+.badge[data-l="Easy"]{color:var(--easy);background:var(--easy-bg)}
+.badge[data-l="Medium"]{color:var(--med);background:var(--med-bg)}
+.badge[data-l="Hard"]{color:var(--hard);background:var(--hard-bg)}
+.question{font-size:1.15rem;font-weight:600;margin:12px 0 16px}
+.opts{display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.opt{width:100%;display:flex;align-items:center;gap:12px;text-align:left;font:inherit;color:inherit;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;min-height:52px;transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--brand)}
+.opt .key{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.9rem;background:var(--line)}
+.opt[aria-checked="true"]{border-color:var(--brand);background:var(--sel)}
+.opt[aria-checked="true"] .key{background:var(--brand);color:var(--brand-ink)}
+button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.tool{flex:1 1 140px;font:inherit;font-weight:600;color:var(--ink);background:transparent;border:2px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:44px}
+.tool:hover{border-color:var(--brand)}
+.tool[aria-expanded="true"]{background:var(--sel);border-color:var(--brand)}
+.panel{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:.97rem}
+.panel[hidden]{display:none}
+.panel.hint{background:var(--hint-bg);border:1px solid var(--hint-line)}
+.panel.sol{background:var(--sol-bg);border:1px solid var(--sol-line)}
+.panel b.t{display:block;margin-bottom:4px}
+.panel ol{margin:6px 0 0;padding-left:20px}
+.panel li{margin:3px 0}
+.nav{display:flex;justify-content:flex-end;margin-top:20px}
+.primary{font:inherit;font-weight:700;color:var(--brand-ink);background:var(--brand);border:0;border-radius:12px;padding:13px 26px;cursor:pointer;min-height:48px}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.score{text-align:center;padding:6px 0 14px}
+.score .big{font-size:3rem;font-weight:800;line-height:1.1}
+.score p{margin:6px 0 0;color:var(--muted)}
+.levels{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0 4px}
+h2{font-size:1.1rem;margin:22px 0 10px}
+.key-line{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;padding:0;list-style:none}
+.key-line li{font-weight:700;font-size:.9rem;border:1px solid var(--line);border-radius:8px;padding:3px 9px}
+.review{display:grid;gap:10px;padding:0;margin:0;list-style:none}
+.review li{border:1px solid var(--line);border-left-width:5px;border-radius:10px;padding:10px 12px;font-size:.95rem}
+.review li.ok{border-left-color:var(--ok)}
+.review li.bad{border-left-color:var(--bad)}
+.review .q{font-weight:600;margin-bottom:4px}
+.review .ok-t{color:var(--ok);font-weight:700}
+.review .bad-t{color:var(--bad);font-weight:700}
+@media (min-width:600px){.card{padding:26px 28px}.question{font-size:1.25rem}header h1{font-size:1.5rem}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#1d4ed8"/><path d="M12 36V14l24 22z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/><path d="M12 30h6v6" fill="none" stroke="#fff" stroke-width="2.5"/></svg>
+    <div>
+      <h1>Pythagorean Theorem Quiz</h1>
+      <p>10 questions: 3 easy, 4 medium, 3 hard</p>
+    </div>
+  </header>
+  <main id="app" class="card" aria-live="polite"></main>
+</div>
+
+<script>
+var QUESTIONS = [
+  {lvl:"Easy", q:"A right triangle has legs of 6 cm and 8 cm. What is the length of the hypotenuse?",
+   o:["9 cm","10 cm","12 cm","14 cm"], a:1,
+   hint:"Use c² = a² + b². Square both legs and add them.",
+   sol:["c² = 6² + 8²","c² = 36 + 64 = 100","c = √100 = 10 cm"]},
+  {lvl:"Easy", q:"The hypotenuse of a right triangle is 13 cm and one leg is 5 cm. Find the other leg.",
+   o:["8 cm","10 cm","12 cm","18 cm"], a:2,
+   hint:"Rearrange the formula: b² = c² − a². The hypotenuse is always the longest side.",
+   sol:["b² = 13² − 5²","b² = 169 − 25 = 144","b = √144 = 12 cm"]},
+  {lvl:"Easy", q:"The legs of a right triangle are 9 cm and 12 cm. How long is the hypotenuse?",
+   o:["15 cm","13 cm","17 cm","21 cm"], a:0,
+   hint:"Both legs are multiples of 3. Compare them with the 3-4-5 triangle.",
+   sol:["c² = 9² + 12²","c² = 81 + 144 = 225","c = √225 = 15 cm","Check: 9-12-15 is the 3-4-5 triangle multiplied by 3."]},
+
+  {lvl:"Medium", q:"A right triangle has legs of 2.5 cm and 6 cm. Find the hypotenuse.",
+   o:["5.5 cm","7.5 cm","6.5 cm","8.5 cm"], a:2,
+   hint:"Square the decimal carefully: 2.5² = 6.25. The sum under the root is a perfect square.",
+   sol:["c² = 2.5² + 6²","c² = 6.25 + 36 = 42.25","c = √42.25 = 6.5 cm"]},
+  {lvl:"Medium", q:"The hypotenuse of a right triangle is 4.1 cm and one leg is 0.9 cm. Find the other leg.",
+   o:["3.2 cm","3.8 cm","4.2 cm","4.0 cm"], a:3,
+   hint:"You are looking for a leg, so subtract: b² = c² − a². Remember that 4.1² = 16.81.",
+   sol:["b² = 4.1² − 0.9²","b² = 16.81 − 0.81 = 16","b = √16 = 4 cm"]},
+  {lvl:"Medium", q:"A 6.5 m ladder leans against a vertical wall. Its foot is 2.5 m from the wall. How high up the wall does the ladder reach?",
+   o:["6 m","5.5 m","4 m","7 m"], a:0,
+   hint:"Draw the right triangle: the ladder is the hypotenuse, the ground and the wall are the legs.",
+   sol:["The ladder is the hypotenuse: c = 6.5 m. The ground distance is a leg: a = 2.5 m.","h² = 6.5² − 2.5²","h² = 42.25 − 6.25 = 36","h = √36 = 6 m"]},
+  {lvl:"Medium", q:"Maya walks 40 m east and then 96 m north. How far is she from her starting point in a straight line?",
+   o:["112 m","104 m","136 m","100 m"], a:1,
+   hint:"East and north make a right angle. The straight line back is the hypotenuse. Note that 40 = 8 × 5 and 96 = 8 × 12.",
+   sol:["d² = 40² + 96²","d² = 1600 + 9216 = 10 816","d = √10 816 = 104 m","Shortcut: 40-96 is 8 × (5-12), so d = 8 × 13 = 104 m."]},
+
+  {lvl:"Hard", q:"A rectangular box measures 3 cm × 4 cm × 12 cm. What is the length of its space diagonal (corner to opposite corner)?",
+   o:["12 cm","15 cm","13 cm","19 cm"], a:2,
+   hint:"First find the diagonal of the 3 × 4 base. Then use it as one leg of a new right triangle with the height 12 cm.",
+   sol:["Base diagonal: x² = 3² + 4² = 25, so x = 5 cm","Space diagonal: d² = 5² + 12² = 25 + 144 = 169","d = √169 = 13 cm","Direct formula: d = √(3² + 4² + 12²) = √169 = 13 cm"]},
+  {lvl:"Hard", q:"The diagonal of a rectangle is 26 cm and one side is 10 cm. What is the area of the rectangle?",
+   o:["120 cm²","260 cm²","480 cm²","240 cm²"], a:3,
+   hint:"Two steps: use the diagonal as the hypotenuse to find the other side, then multiply the two sides.",
+   sol:["Other side: b² = 26² − 10² = 676 − 100 = 576","b = √576 = 24 cm","Area = 10 × 24 = 240 cm²"]},
+  {lvl:"Hard", q:"Find the distance between the points A(−3, −2) and B(9, 3) on the coordinate plane.",
+   o:["13 units","11 units","15 units","17 units"], a:0,
+   hint:"Draw a right triangle with AB as the hypotenuse. Its legs are the horizontal and vertical differences of the coordinates.",
+   sol:["Horizontal leg: Δx = 9 − (−3) = 12","Vertical leg: Δy = 3 − (−2) = 5","AB² = 12² + 5² = 144 + 25 = 169","AB = √169 = 13 units"]}
+];
+
+var LETTERS = ["A","B","C","D"];
+var app = document.getElementById("app");
+var current = 0;
+var answers = [];
+
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderQuestion(){
+  var q = QUESTIONS[current];
+  var total = QUESTIONS.length;
+  var picked = answers[current];
+  var html = "";
+  html += '<div class="progress-row"><span>Question ' + (current+1) + ' of ' + total + '</span><span class="badge" data-l="' + q.lvl + '">' + q.lvl + '</span></div>';
+  html += '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + (current+1) + '"><i style="width:' + ((current+1)/total*100) + '%"></i></div>';
+  html += '<p class="question">' + esc(q.q) + '</p>';
+  html += '<div class="opts" role="radiogroup" aria-label="Answer options">';
+  for (var i=0;i<q.o.length;i++){
+    html += '<button type="button" class="opt" role="radio" aria-checked="' + (picked===i) + '" data-i="' + i + '"><span class="key">' + LETTERS[i] + '</span><span>' + esc(q.o[i]) + '</span></button>';
+  }
+  html += '</div>';
+  html += '<div class="tools">';
+  html += '<button type="button" class="tool" id="hintBtn" aria-expanded="false" aria-controls="hintBox">Show Hint</button>';
+  html += '<button type="button" class="tool" id="solBtn" aria-expanded="false" aria-controls="solBox">Show Solution</button>';
+  html += '</div>';
+  html += '<div class="panel hint" id="hintBox" hidden><b class="t">Hint</b>' + esc(q.hint) + '</div>';
+  html += '<div class="panel sol" id="solBox" hidden><b class="t">Step-by-step solution</b><ol>';
+  for (var s=0;s<q.sol.length;s++){ html += '<li>' + esc(q.sol[s]) + '</li>'; }
+  html += '</ol></div>';
+  html += '<div class="nav"><button type="button" class="primary" id="nextBtn"' + (picked===undefined ? ' disabled' : '') + '>' + (current===total-1 ? 'Finish quiz' : 'Next') + '</button></div>';
+  app.innerHTML = html;
+
+  var optBtns = app.querySelectorAll(".opt");
+  optBtns.forEach(function(b){
+    b.addEventListener("click", function(){
+      answers[current] = parseInt(b.getAttribute("data-i"), 10);
+      optBtns.forEach(function(o){ o.setAttribute("aria-checked", String(o===b)); });
+      document.getElementById("nextBtn").disabled = false;
+    });
+  });
+  bindToggle("hintBtn","hintBox","Hint");
+  bindToggle("solBtn","solBox","Solution");
+  document.getElementById("nextBtn").addEventListener("click", function(){
+    if (answers[current]===undefined) return;
+    if (current < total-1){ current++; renderQuestion(); window.scrollTo({top:0}); }
+    else { renderResults(); window.scrollTo({top:0}); }
+  });
+}
+
+function bindToggle(btnId, boxId, word){
+  var btn = document.getElementById(btnId), box = document.getElementById(boxId);
+  btn.addEventListener("click", function(){
+    var open = box.hidden;
+    box.hidden = !open;
+    btn.setAttribute("aria-expanded", String(open));
+    btn.textContent = (open ? "Hide " : "Show ") + word;
+  });
+}
+
+function renderResults(){
+  var total = QUESTIONS.length, score = 0;
+  var by = {Easy:[0,0], Medium:[0,0], Hard:[0,0]};
+  QUESTIONS.forEach(function(q,i){
+    by[q.lvl][1]++;
+    if (answers[i]===q.a){ score++; by[q.lvl][0]++; }
+  });
+  var pct = Math.round(score/total*100);
+  var msg = pct===100 ? "Perfect score. Excellent work!" : pct>=70 ? "Great job! You know the theorem well." : pct>=40 ? "Good effort. Review the solutions below and try again." : "Keep practicing. Open the solutions and try again.";
+  var html = '<div class="score"><div class="big">' + score + ' / ' + total + '</div><p>' + pct + '% correct. ' + msg + '</p>';
+  html += '<div class="levels">';
+  ["Easy","Medium","Hard"].forEach(function(l){ html += '<span class="badge" data-l="' + l + '">' + l + ': ' + by[l][0] + '/' + by[l][1] + '</span>'; });
+  html += '</div></div>';
+
+  html += '<h2>Answer Key</h2><ul class="key-line">';
+  QUESTIONS.forEach(function(q,i){ html += '<li>' + (i+1) + '. ' + LETTERS[q.a] + '</li>'; });
+  html += '</ul><ul class="review">';
+  QUESTIONS.forEach(function(q,i){
+    var ok = answers[i]===q.a;
+    html += '<li class="' + (ok?'ok':'bad') + '"><div class="q">' + (i+1) + '. ' + esc(q.q) + '</div>';
+    html += '<div>Correct answer: <b>' + LETTERS[q.a] + ') ' + esc(q.o[q.a]) + '</b></div>';
+    html += ok ? '<div class="ok-t">Your answer: ' + LETTERS[answers[i]] + ') ' + esc(q.o[answers[i]]) + ' (correct)</div>'
+               : '<div class="bad-t">Your answer: ' + LETTERS[answers[i]] + ') ' + esc(q.o[answers[i]]) + ' (incorrect)</div>';
+    html += '</li>';
+  });
+  html += '</ul><div class="nav"><button type="button" class="primary" id="again">Try again</button></div>';
+  app.innerHTML = html;
+  document.getElementById("again").addEventListener("click", function(){
+    current = 0; answers = []; renderQuestion(); window.scrollTo({top:0});
+  });
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
